@@ -35,65 +35,55 @@ map.on('load', () => {
         type: 'geojson',
         data: 'https://bostonopendata-boston.opendata.arcgis.com/datasets/boston::RECREATION_BikeFacilities.geojson' 
     });
-    
-    
+
+    map.addLayer({
+        id: 'cambridge-bike-lanes',
+        type: 'line',
+        source: 'cambridge_route',
+        paint: {
+            'line-color': '#FFA500', // Orange for distinction
+            'line-width': 5,
+            'line-opacity': 0.6
+        }
+    });
+
     // Load the Bluebikes JSON file
     const jsonUrl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json';
 
-    d3.json(jsonUrl)
-        .then(jsonData => {
-            console.log('Loaded JSON Data:', jsonData); // Verify structure
-
-            // Extract station data
-            const stations = jsonData.data.stations;
-            console.log('Stations Array:', stations); // Verify array extraction
-        })
-        .catch(error => {
-            console.error('Error Loading JSON:', error);
-        });
-
-
-
-    // Select the SVG layer and initialize an empty array for stations
     const svg = d3.select('#map').select('svg');
     let stations = [];
 
     function getCoords(station) {
-        const point = new mapboxgl.LngLat(+station.lon, +station.lat);
-        const { x, y } = map.project(point);
-        return { cx: x, cy: y };
+        const point = map.project(new mapboxgl.LngLat(+station.lon, +station.lat));
+        return { cx: point.x, cy: point.y };
     }
 
-    
+    // Load station data
     d3.json(jsonUrl).then(jsonData => {
         stations = jsonData.data.stations;
-    
-        const circles = svg.selectAll('circle')
+
+        svg.selectAll('circle')
             .data(stations)
             .enter()
             .append('circle')
-            .attr('r', 5) // Circle size
-            .attr('fill', 'steelblue') // Fill color
-            .attr('stroke', 'white') // Border color
+            .attr('r', 5) // Fixed circle size
+            .attr('fill', 'steelblue')
+            .attr('stroke', 'white')
             .attr('stroke-width', 1)
-            .attr('opacity', 0.8);
+            .attr('opacity', 0.6);
+
+        updatePositions(); // Ensure circles appear correctly
     });
 
-    
     function updatePositions() {
         svg.selectAll('circle')
             .attr('cx', d => getCoords(d).cx)
             .attr('cy', d => getCoords(d).cy);
     }
 
-    updatePositions();
-    
+    // Ensure markers move correctly when zooming/panning
     map.on('move', updatePositions);
     map.on('zoom', updatePositions);
     map.on('resize', updatePositions);
     map.on('moveend', updatePositions);
-    
-
-
 });
-
