@@ -49,6 +49,7 @@ map.on('load', () => {
 
     // Load the Bluebikes JSON file
     const jsonUrl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json';
+    
 
     const svg = d3.select('#map').select('svg');
     let stations = [];
@@ -70,7 +71,7 @@ map.on('load', () => {
             .attr('fill', 'steelblue')
             .attr('stroke', 'white')
             .attr('stroke-width', 1)
-            .attr('opacity', 0.6);
+            .attr('opacity', 0.8);
 
         updatePositions(); // Ensure circles appear correctly
     });
@@ -86,4 +87,5 @@ map.on('load', () => {
     map.on('zoom', updatePositions);
     map.on('resize', updatePositions);
     map.on('moveend', updatePositions);
+
 });
