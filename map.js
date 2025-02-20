@@ -33,19 +33,65 @@ map.on('load', () => {
 
     map.addSource('cambridge_route', {
         type: 'geojson',
-        data: 'https://bostonopendata-boston.opendata.arcgis.com/datasets/boston::RECREATION_BikeFacilities.geojson' // Replace with actual link
+        data: 'https://bostonopendata-boston.opendata.arcgis.com/datasets/boston::RECREATION_BikeFacilities.geojson' 
     });
     
-    map.addLayer({
-        id: 'cambridge-bike-lanes',
-        type: 'line',
-        source: 'cambridge_route',
-        paint: {
-            'line-color': '#FFA500', // Orange for distinction
-            'line-width': 5,
-            'line-opacity': 0.6
-        }
+    
+    // Load the Bluebikes JSON file
+    const jsonUrl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json';
+
+    d3.json(jsonUrl)
+        .then(jsonData => {
+            console.log('Loaded JSON Data:', jsonData); // Verify structure
+
+            // Extract station data
+            const stations = jsonData.data.stations;
+            console.log('Stations Array:', stations); // Verify array extraction
+        })
+        .catch(error => {
+            console.error('Error Loading JSON:', error);
+        });
+
+
+
+    // Select the SVG layer and initialize an empty array for stations
+    const svg = d3.select('#map').select('svg');
+    let stations = [];
+
+    function getCoords(station) {
+        const point = new mapboxgl.LngLat(+station.lon, +station.lat);
+        const { x, y } = map.project(point);
+        return { cx: x, cy: y };
+    }
+
+    
+    d3.json(jsonUrl).then(jsonData => {
+        stations = jsonData.data.stations;
+    
+        const circles = svg.selectAll('circle')
+            .data(stations)
+            .enter()
+            .append('circle')
+            .attr('r', 5) // Circle size
+            .attr('fill', 'steelblue') // Fill color
+            .attr('stroke', 'white') // Border color
+            .attr('stroke-width', 1)
+            .attr('opacity', 0.8);
     });
+
+    
+    function updatePositions() {
+        svg.selectAll('circle')
+            .attr('cx', d => getCoords(d).cx)
+            .attr('cy', d => getCoords(d).cy);
+    }
+
+    updatePositions();
+    
+    map.on('move', updatePositions);
+    map.on('zoom', updatePositions);
+    map.on('resize', updatePositions);
+    map.on('moveend', updatePositions);
     
 
 
