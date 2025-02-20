@@ -7,6 +7,41 @@ html, body {
     justify-content: center; /* Center horizontally */
 }
 
+header {
+    display: flex;
+    gap: 1em;
+    align-items: baseline;
+    width: 100%;
+    padding: 10px;
+}
+
+label {
+    margin-left: auto;
+}
+
+#time-slider {
+    width: 300px;
+}
+
+time {
+    display: block;
+}
+
+time, #any-time {
+    display: block;
+    margin-top: 5px;
+}
+
+#any-time {
+    font-style: italic;
+    color: gray;
+}
+
+em {
+    color: gray;
+    font-style: italic;
+}
+
 
 #map {
     width: 100%; /* Adjust width to your desired size */

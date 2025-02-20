@@ -12,6 +12,39 @@ const map = new mapboxgl.Map({
 });
 
 
+let timeFilter = -1; // Default: No filtering
+
+const timeSlider = document.getElementById('time-slider');
+const selectedTime = document.getElementById('selected-time');
+const anyTimeLabel = document.getElementById('any-time');
+
+function formatTime(minutes) {
+    const date = new Date(0, 0, 0, 0, minutes); // Convert to HH:MM AM/PM
+    return date.toLocaleTimeString('en-US', { timeStyle: 'short' });
+}
+
+function updateTimeDisplay() {
+    timeFilter = Number(timeSlider.value); // Get slider value
+
+    if (timeFilter === -1) {
+        selectedTime.textContent = ''; // Clear display
+        anyTimeLabel.style.display = 'block'; // Show "(any time)"
+    } else {
+        selectedTime.textContent = formatTime(timeFilter); // Show formatted time
+        anyTimeLabel.style.display = 'none'; // Hide "(any time)"
+    }
+
+    // (Filtering logic will be added in Step 5.3)
+}
+
+// Listen for input events on the slider
+timeSlider.addEventListener('input', updateTimeDisplay);
+
+// Set the initial state
+updateTimeDisplay();
+
+
+
 map.on('load', () => {
     // Add Boston bike lanes as a data source
     map.addSource('boston_route', {
@@ -86,7 +119,7 @@ map.on('load', () => {
             // Define radius scale AFTER traffic data is available
             const radiusScale = d3.scaleSqrt()
                 .domain([0, d3.max(stations, d => d.totalTraffic)])
-                .range([3, 25]);
+                .range([0, 25]);
 
             // Create circles AFTER stations are updated
             svg.selectAll('circle')
@@ -126,3 +159,4 @@ map.on('load', () => {
     
 
 });
+
