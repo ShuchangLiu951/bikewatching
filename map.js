@@ -47,9 +47,9 @@ map.on('load', () => {
         }
     });
 
-    // Load the Bluebikes JSON file
-    const jsonUrl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json';
     
+    const jsonUrl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json';
+    const trafficDataUrl = 'https://dsc106.com/labs/lab07/data/bluebikes-traffic-2024-03.csv';
 
     const svg = d3.select('#map').select('svg');
     let stations = [];
@@ -59,33 +59,70 @@ map.on('load', () => {
         return { cx: point.x, cy: point.y };
     }
 
-    // Load station data
+    // Load station data FIRST
     d3.json(jsonUrl).then(jsonData => {
         stations = jsonData.data.stations;
 
-        svg.selectAll('circle')
-            .data(stations)
-            .enter()
-            .append('circle')
-            .attr('r', 5) // Fixed circle size
-            .attr('fill', 'steelblue')
-            .attr('stroke', 'white')
-            .attr('stroke-width', 1)
-            .attr('opacity', 0.8);
+        console.log('Loaded Station Data:', stations); // Debugging
 
-        updatePositions(); // Ensure circles appear correctly
+        // Now, fetch traffic data
+        d3.csv(trafficDataUrl).then(data => {
+            console.log('Loaded Traffic Data:', data); // Debugging
+
+            let departures = d3.rollup(data, v => v.length, d => d.start_station_id);
+            let arrivals = d3.rollup(data, v => v.length, d => d.end_station_id);
+
+            // Update station traffic data
+            stations = stations.map(station => {
+                let id = station.short_name;
+                station.arrivals = arrivals.get(id) ?? 0;
+                station.departures = departures.get(id) ?? 0;
+                station.totalTraffic = station.arrivals + station.departures;
+                return station;
+            });
+
+            console.log('Updated Stations:', stations); // Debugging
+
+            // Define radius scale AFTER traffic data is available
+            const radiusScale = d3.scaleSqrt()
+                .domain([0, d3.max(stations, d => d.totalTraffic)])
+                .range([3, 25]);
+
+            // Create circles AFTER stations are updated
+            svg.selectAll('circle')
+                .data(stations)
+                .enter()
+                .append('circle')
+                .attr('fill', 'steelblue')
+                .attr('stroke', 'white')
+                .attr('stroke-width', 1)
+                .attr('opacity', 0.6)
+                .each(function(d) {
+                    d3.select(this)
+                        .append('title')
+                        .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+                });
+
+            // Function to update positions and sizes
+            function updatePositions() {
+                if (stations.length === 0) return; // Ensure stations exist
+
+                svg.selectAll('circle')
+                    .attr('cx', d => getCoords(d).cx)
+                    .attr('cy', d => getCoords(d).cy)
+                    .attr('r', d => radiusScale(d.totalTraffic))
+                    .select('title')
+                    .text(d => `${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+            }
+
+            // Ensure markers move correctly
+            updatePositions();
+            map.on('move', updatePositions);
+            map.on('zoom', updatePositions);
+            map.on('resize', updatePositions);
+            map.on('moveend', updatePositions);
+        });
     });
-
-    function updatePositions() {
-        svg.selectAll('circle')
-            .attr('cx', d => getCoords(d).cx)
-            .attr('cy', d => getCoords(d).cy);
-    }
-
-    // Ensure markers move correctly when zooming/panning
-    map.on('move', updatePositions);
-    map.on('zoom', updatePositions);
-    map.on('resize', updatePositions);
-    map.on('moveend', updatePositions);
+    
 
 });
