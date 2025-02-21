@@ -116,7 +116,7 @@ map.on('load', () => {
                 .each(function(d) {
                     d3.select(this)
                         .append('title')
-                        .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+                        .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals})`);
                 });
 
             function updatePositions() {
@@ -127,7 +127,7 @@ map.on('load', () => {
                     .attr('cy', d => getCoords(d).cy)
                     .attr('r', d => radiusScale(d.totalTraffic))
                     .select('title')
-                    .text(d => `${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+                    .text(d => `${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals})`);
             }
 
             updatePositions();
@@ -138,5 +138,3 @@ map.on('load', () => {
         });
     });
 });
-
-
