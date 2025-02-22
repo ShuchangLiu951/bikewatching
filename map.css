@@ -7,15 +7,14 @@ html, body {
     justify-content: center; /* Center horizontally */
 }
 
-header {
+header{
     display: flex;
     gap: 1em;
     align-items: baseline;
     width: 100%;
-    padding: 10px;
 }
 
-label {
+header label{
     margin-left: auto;
 }
 
@@ -60,5 +59,48 @@ em {
 
 
 circle {
-    pointer-events: auto; /* Allow interaction with circles */
+    pointer-events: auto;
+    --color-departures: steelblue;
+    --color-arrivals: darkorange;
+    --color: color-mix(
+    in oklch,
+    var(--color-departures) calc(100% * var(--departure-ratio)),
+    var(--color-arrivals)
+    );
+    fill: var(--color); 
+}
+
+
+.legend-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: none;  
+    padding: 10px 0;   
+    font-size: 14px;
+    font-weight: bold;
+    width: fit-content;
+    margin: 10px auto;
+    box-shadow: none;  
+    border: none;  
+}
+
+.legend {
+    display: flex;
+    gap: 15px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: none; 
 }

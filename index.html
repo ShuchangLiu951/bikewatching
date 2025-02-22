@@ -11,20 +11,35 @@
 </head>
 <body>
     <h1>🚴‍♂️ Bikewatching</h1>
-    <header style="display: flex; gap: 1em; align-items: baseline;">
+    <header>
         <label style="margin-left: auto;">Filter by time: 
             <input id="time-slider" type="range" min="-1" max="1440" value="-1">
             <time id="selected-time"></time>
-            <em id="any-time">(any time)</em>
+            <em id= "any-time">(any time)</em>
         </label>
     </header>
     <div id="map">
-        <svg></svg> 
+        <svg></svg>
     </div>
-
+    <div class="legend-container">
+        <span class="legend-title">LEGEND:</span>
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-swatch" style="background-color: steelblue;"></span>
+                More departures
+            </div>
+            <div class="legend-item">
+                <span class="legend-swatch" style="background-color: purple;"></span>
+                Balanced
+            </div>
+            <div class="legend-item">
+                <span class="legend-swatch" style="background-color: darkorange;"></span>
+                More arrivals
+            </div>
+        </div>
+    </div>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="map.js"></script>
-
 </body>
 </html>
